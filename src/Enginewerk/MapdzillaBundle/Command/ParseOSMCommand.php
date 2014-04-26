@@ -36,6 +36,7 @@ class ParseOSMCommand extends ContainerAwareCommand
             ->setDescription('Parses OSM file')
             ->addArgument('bbox', InputArgument::REQUIRED, 'FROM 14.5317,53.4205 TO 14.5653,53.4311')
         ;
+        //14.4976,53.4254,14.5339,53.4416
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -48,7 +49,7 @@ class ParseOSMCommand extends ContainerAwareCommand
         $output->write('<info>Dowloading data...</info>');
         $url = sprintf('http://api.openstreetmap.org/api/0.6/map?bbox=%s', $input->getArgument('bbox'));
         $xmlData = $this->getXMLData($url);
-        $output->writeln(strlen($xmlData) . ' bytes');
+        $output->writeln(number_format(strlen($xmlData), 2, ',', ' ') . ' bytes');
         
         $this->crawler = new Crawler($xmlData);
         //$mapNodes = $crawler->filter('osm > way > tag[v=parking]');
