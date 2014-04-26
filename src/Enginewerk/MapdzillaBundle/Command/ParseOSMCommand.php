@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Symfony\Component\DomCrawler\Crawler;
+use Enginewerk\MapdzillaBundle\Entity\Node;
+use Enginewerk\MapdzillaBundle\Entity\Way;
 
 /**
  * Description of ParseOSMCommand
@@ -60,16 +62,38 @@ class ParseOSMCommand extends ContainerAwareCommand
         //$mapNodes = $crawler->filter('osm > node')->siblings();
 
         $output->writeln('<info>Nodes</info>');    
-        $this->filterNodes($mapNodes);
+        $nodes = $this->filterNodes($mapNodes);
+        
+        foreach ($nodes as $node) {
+            $this->updateNode($node);
+        }
+        
+        $this
+                ->getDoctrine()
+                ->getEntityManager()
+                ->flush();
         
         $output->writeln('<info>Ways</info>');
         $ways = $this->filterWays($mapNodes);
         
-        foreach($ways as $way) {
-            $output->writeln('Way: ' . $way->getAttribute('id') . ' ');
-            foreach($this->getWayNodes($way) as $wayNode) {
+        foreach($ways as $wayDom) {
+            $output->writeln('Way: ' . $wayDom->getAttribute('id') . ' ');
+            
+            $way = $this->updateWay($wayDom);
+            
+            /**
+             * @var Symfony\Component\DomCrawler\Crawler $wayNode
+             */
+            foreach($this->getWayNodes($wayDom) as $wayNode) {
                 $output->writeln(sprintf('lat: %s, lon: %s', $wayNode->attr('lat'), $wayNode->attr('lon') ));
+                $this->updateNode($wayNode->getNode(0), $way);
             }
+            
+            $this
+                ->getDoctrine()
+                ->getEntityManager()
+                ->flush();
+            
             $output->writeln('');
         }
 
@@ -77,6 +101,8 @@ class ParseOSMCommand extends ContainerAwareCommand
     
     protected function filterNodes($mapNodes)
     {
+        $nodes = array();
+        
         foreach ($mapNodes as $domElement) {
             if($domElement->parentNode->nodeName === 'node') {
                 
@@ -91,8 +117,11 @@ class ParseOSMCommand extends ContainerAwareCommand
                             $parentNode->getAttribute('lon')
                             )
                         );
+                $nodes[] = $parentNode;
             }
         }
+        
+        return $nodes;
     }
     
     protected function filterWays($mapNodes)
@@ -101,14 +130,6 @@ class ParseOSMCommand extends ContainerAwareCommand
         
         foreach ($mapNodes as $domElement) {
             if($domElement->parentNode->nodeName === 'way') {
-                /*$this
-                    ->getOutput()
-                    ->write($domElement->parentNode->nodeName);
-                
-                $this
-                    ->getOutput()
-                    ->writeln(' ' . $domElement->parentNode->getAttribute('id'));*/
-                
                 $wayList[] = $domElement->parentNode;
             }
         }
@@ -174,5 +195,74 @@ class ParseOSMCommand extends ContainerAwareCommand
         }
 
         return $response;
+    }
+    
+    /**
+     * 
+     * @param type $wayNode
+     * @return \Enginewerk\MapdzillaBundle\Entity\Way
+     */
+    protected function updateWay($wayNode)
+    {
+        $wayId = $wayNode->getAttribute('id');
+        
+        $doctrine = $this->getDoctrine();
+        $em = $doctrine->getEntityManager();
+
+        $way = $doctrine
+                ->getRepository('EnginewerkMapdzillaBundle:Way')
+                ->findByOsmWayId($wayId);
+        
+        if (!$way) {
+            $way = new Way();
+            $way->setOsmWayId($wayId);
+            
+            $em->persist($way);
+        }
+        
+        return $way;
+    }
+    
+    /**
+     * 
+     * @param type $domNode
+     * @param \Enginewerk\MapdzillaBundle\Entity\Way $way
+     * @return \Enginewerk\MapdzillaBundle\Entity\Node
+     */
+    protected function updateNode(\DOMElement $domNode, $way = null)
+    {
+        $nodeId = $domNode->getAttribute('id');
+        $lat = $domNode->getAttribute('lat');
+        $lon = $domNode->getAttribute('lon');
+        
+        $doctrine = $this->getDoctrine();
+        $em = $doctrine->getEntityManager();
+
+        $node = $doctrine
+                ->getRepository('EnginewerkMapdzillaBundle:Node')
+                ->findByOsmNodeId($nodeId);
+        
+        if (!$node) {
+            $node = new Node();
+            $node->setOsmNodeId($nodeId);
+            $node->setLat($lat);
+            $node->setLon($lon);
+            $node->setWay($way);
+            
+            $em->persist($node);
+        }
+        
+        return $node;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    protected function getDoctrine() 
+    {
+        return $this
+                ->getContainer()
+                ->get('doctrine');
     }
 }
