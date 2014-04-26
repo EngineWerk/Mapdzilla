@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * 
  * @ORM\Entity
  * @ORM\Table(name="way")
- * 
+ * @ORM\Entity(repositoryClass="Enginewerk\MapdzillaBundle\Entity\WayRepository")
  */
 class Way 
 {

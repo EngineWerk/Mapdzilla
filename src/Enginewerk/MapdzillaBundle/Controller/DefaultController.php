@@ -24,7 +24,7 @@ class DefaultController extends Controller
      * @Route("/aarrghhh/{lat}/{lon}/{radius}", defaults={"radius" = 1})
      * @Template()
      */
-    public function serachAction($lat, $lon)
+    public function serachAction($lat, $lon, $radius)
     {
         $data = array(
             array(
@@ -46,5 +46,18 @@ class DefaultController extends Controller
         );
         
         return new JsonResponse($data, 200);
+    }
+    
+    /**
+     * @Route("/awrr/{lat}/{lon}/{radius}", defaults={"radius" = 1})
+     * @Template()
+     */
+    public function findAction($lat, $lon, $radius)
+    {
+        $results = $this
+                ->get('mapdzilla_finder')
+                ->find($lat, $lon, $radius);
+                
+        return new JsonResponse($results, 200);
     }
 }

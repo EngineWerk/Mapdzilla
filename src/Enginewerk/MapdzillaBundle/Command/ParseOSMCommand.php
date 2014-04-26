@@ -35,8 +35,8 @@ class ParseOSMCommand extends ContainerAwareCommand
     {
         $this
             ->setName('mapdzilla:parse-osm')
-            ->setDescription('Parses OSM file')
-            ->addArgument('bbox', InputArgument::REQUIRED, 'FROM 14.5317,53.4205 TO 14.5653,53.4311')
+            ->setDescription('Parses OSM file');
+            //->addArgument('bbox', InputArgument::REQUIRED, 'FROM 14.5317,53.4205 TO 14.5653,53.4311')
         ;
         //14.4976,53.4254,14.5339,53.4416
     }
@@ -48,10 +48,22 @@ class ParseOSMCommand extends ContainerAwareCommand
         //$mapfile = $this->getContainer()->get('kernel')->getRootDir() . '/data/map.osm';
         //$xmlData = file_get_contents($mapfile);
         
-        $output->write('<info>Dowloading data...</info>');
-        $url = sprintf('http://api.openstreetmap.org/api/0.6/map?bbox=%s', $input->getArgument('bbox'));
-        $xmlData = $this->getXMLData($url);
-        $output->writeln(number_format(strlen($xmlData), 2, ',', ' ') . ' bytes');
+        $files = scandir($this->getContainer()->get('kernel')->getRootDir() . '/data/');
+        foreach ($files as $mapfile) {
+            $filepath = $this->getContainer()->get('kernel')->getRootDir() . '/data/' . $mapfile;
+            if (is_file($filepath)) {
+                $this->processData(file_get_contents($filepath));
+            }
+        }
+
+    }
+    
+    protected function processData($xmlData) 
+    {
+        $this->output->write('<info>Dowloading data...</info>');
+        /*$url = sprintf('http://api.openstreetmap.org/api/0.6/map?bbox=%s', $input->getArgument('bbox'));
+        $xmlData = $this->getXMLData($url);*/
+        $this->output->writeln(number_format(strlen($xmlData), 2, ',', ' ') . ' bytes');
         
         $this->crawler = new Crawler($xmlData);
         //$mapNodes = $crawler->filter('osm > way > tag[v=parking]');
@@ -61,7 +73,7 @@ class ParseOSMCommand extends ContainerAwareCommand
         
         //$mapNodes = $crawler->filter('osm > node')->siblings();
 
-        $output->writeln('<info>Nodes</info>');    
+        $this->output->writeln('<info>Nodes</info>');    
         $nodes = $this->filterNodes($mapNodes);
         
         foreach ($nodes as $node) {
@@ -73,11 +85,11 @@ class ParseOSMCommand extends ContainerAwareCommand
                 ->getEntityManager()
                 ->flush();
         
-        $output->writeln('<info>Ways</info>');
+        $this->output->writeln('<info>Ways</info>');
         $ways = $this->filterWays($mapNodes);
         
         foreach($ways as $wayDom) {
-            $output->writeln('Way: ' . $wayDom->getAttribute('id') . ' ');
+            $this->output->writeln('Way: ' . $wayDom->getAttribute('id') . ' ');
             
             $way = $this->updateWay($wayDom);
             
@@ -85,7 +97,7 @@ class ParseOSMCommand extends ContainerAwareCommand
              * @var Symfony\Component\DomCrawler\Crawler $wayNode
              */
             foreach($this->getWayNodes($wayDom) as $wayNode) {
-                $output->writeln(sprintf('lat: %s, lon: %s', $wayNode->attr('lat'), $wayNode->attr('lon') ));
+                $this->output->writeln(sprintf('lat: %s, lon: %s', $wayNode->attr('lat'), $wayNode->attr('lon') ));
                 $this->updateNode($wayNode->getNode(0), $way);
             }
             
@@ -94,12 +106,11 @@ class ParseOSMCommand extends ContainerAwareCommand
                 ->getEntityManager()
                 ->flush();
             
-            $output->writeln('');
+            $this->output->writeln('');
         }
-
     }
-    
-    protected function filterNodes($mapNodes)
+
+        protected function filterNodes($mapNodes)
     {
         $nodes = array();
         

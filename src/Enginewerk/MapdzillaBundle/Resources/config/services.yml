@@ -1,0 +1,4 @@
+services:
+    mapdzilla_finder:
+        class:     Enginewerk\MapdzillaBundle\Finder\ParkingLot
+        arguments: ["@doctrine"]   
