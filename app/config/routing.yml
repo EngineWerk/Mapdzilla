@@ -1,0 +1,5 @@
+enginewerk_mapdzilla:
+    resource: "@EnginewerkMapdzillaBundle/Controller/"
+    type:     annotation
+    prefix:   /
+

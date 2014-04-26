@@ -1,4 +1,9 @@
 <?php
+ini_set('upload_max_filesize', '64M');
+ini_set('post_max_size', '64M');
+ini_set('memory_limit', '128M');
+ 
+date_default_timezone_set('Europe/Warsaw');
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -16,6 +21,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new Enginewerk\MapdzillaBundle\EnginewerkMapdzillaBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
