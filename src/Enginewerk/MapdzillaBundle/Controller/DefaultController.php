@@ -17,7 +17,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return new Response('To Aarrghhh type /aarrghhh/{lat}/{lon}/{radius}');
+        return array();//('<h1>Mapdzilla</h1><p>To Aarrghhh type /aarrghhh/{lat}/{lon}/{radius} OR /awrr/{lat}/{lon}/{radius}</p>');
     }
     
     /**
