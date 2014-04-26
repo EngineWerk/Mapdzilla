@@ -15,6 +15,7 @@ class WayRepository extends EntityRepository
     public function findAllJSON($lat, $lon, $radius)
     {
         $queryBuilder = $this->createQueryBuilder('s');
+        $queryBuilder->setMaxResults($radius * 5);
         /*$queryBuilder
                 ->select('s.website AS name')
                 ->where(
@@ -25,7 +26,6 @@ class WayRepository extends EntityRepository
 
         return $queryBuilder
                 ->getQuery()
-                ->getArrayResult();
+                ->getResult();
     }
-
 }

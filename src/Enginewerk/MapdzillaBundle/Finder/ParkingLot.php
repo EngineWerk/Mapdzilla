@@ -26,7 +26,7 @@ class ParkingLot
         /** @var $repository \Enginewerk\MapdzillaBundle\Entity\WayRepository **/
         $repositoryWays = $this->doctrine->getRepository('EnginewerkMapdzillaBundle:Way');
         //$result = $repository->findAllJSON($lat, $lon, $radius);
-        $ways = $repositoryWays->findAll();
+        $ways = $repositoryWays->findAllJSON($lat, $lon, $radius);
         /*
         $repositoryNode = $this->doctrine->getRepository('EnginewerkMapdzillaBundle:Node');
         $nodes = $repository->findAll();*/
@@ -51,6 +51,8 @@ class ParkingLot
     {
         $template['id'] = $way->getOsmWayId();
         $template['capacity'] = rand(0, 69);
+        $zone = array('A','B','-');
+        $template['zone'] = $zone[rand(0, 2)];
         
         foreach($way->getNodes() as $node) {
             $template['ll'][] = array('lat' => $node->getLat(), 'lon' => $node->getLon());
