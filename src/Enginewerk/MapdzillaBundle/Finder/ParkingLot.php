@@ -40,6 +40,8 @@ class ParkingLot
         $waysRegister = array();
         
         foreach ($nodes as $node) {
+            //var_dump($nodes);die();
+            $template['distance'] = $node->getId();
             if ($node->getWay() == null) {
                 $result[] = $this->formatNode($node, $template);
             } else {
