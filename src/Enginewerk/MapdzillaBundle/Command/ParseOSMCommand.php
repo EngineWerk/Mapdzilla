@@ -45,15 +45,13 @@ class ParseOSMCommand extends ContainerAwareCommand
     {
         $this->output = $output;
         
-        //$mapfile = $this->getContainer()->get('kernel')->getRootDir() . '/data/map.osm';
-        //$xmlData = file_get_contents($mapfile);
-        
         $files = scandir($this->getContainer()->get('kernel')->getRootDir() . '/data/');
         foreach ($files as $mapfile) {
             $filepath = $this->getContainer()->get('kernel')->getRootDir() . '/data/' . $mapfile;
             if (is_file($filepath)) {
                 $this->processData(file_get_contents($filepath));
             }
+            gc_collect_cycles();
         }
 
     }
@@ -110,7 +108,7 @@ class ParseOSMCommand extends ContainerAwareCommand
         }
     }
 
-        protected function filterNodes($mapNodes)
+    protected function filterNodes($mapNodes)
     {
         $nodes = array();
         
