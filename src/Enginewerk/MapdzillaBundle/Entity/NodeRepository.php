@@ -13,17 +13,15 @@ use Enginewerk\MapdzillaBundle\Entity\Node;
  */
 class NodeRepository extends EntityRepository
 {
-    public function getDomainsForUser(User $user)
+    public function findAllJSON($lat, $lon, $radius)
     {
-        $queryBuilder = $this->createQueryBuilder('d');
-        $query = $queryBuilder
-            ->where($queryBuilder->expr()->eq('d.user', ':user'))
-            ->setParameter('user', $user)
-            ->orderBy('d.name', 'ASC')
-            ->getQuery()
-            ;
+        $queryBuilder = $this->createQueryBuilder('n');
+        $queryBuilder
+                ->setMaxResults($radius * 5)
+                ->where('n.way IS NULL');
 
-        return $query->getResult();
+        return $queryBuilder
+                ->getQuery()
+                ->getResult();
     }
-
 }
