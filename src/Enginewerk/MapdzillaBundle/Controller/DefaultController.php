@@ -17,39 +17,17 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return array();//('<h1>Mapdzilla</h1><p>To Aarrghhh type /aarrghhh/{lat}/{lon}/{radius} OR /awrr/{lat}/{lon}/{radius}</p>');
-    }
-    
-    /**
-     * @Route("/aarrghhh/{lat}/{lon}/{radius}", defaults={"radius" = 1})
-     * @Template()
-     */
-    public function serachAction($lat, $lon, $radius)
-    {
-        $data = array(
-            array(
-                'll' => array(
-                    'lat' => "53.4309816",
-                    'lon' => "14.5526560"
-                    ),
-                'zone' => 'A',
-                'capacity' => 45
-                ),
-            array(
-                'll' => array(
-                    'lat' => "53.4309816",
-                    'lon' => "14.5526560"
-                    ),
-                'zone' => 'A',
-                'capacity' => 45
-                )
-        );
+        $finder = $this->get('mapdzilla_finder');
+        /* @var $finder \Enginewerk\MapdzillaBundle\Finder\ParkingLot */
         
-        return new JsonResponse($data, 200);
+        return array(
+            'described' => count($finder->getWithDescription()),
+            'undescribed' => count($finder->getWithNoDescription())
+                );
     }
     
     /**
-     * @Route("/awrr/{lat}/{lon}/{radius}", defaults={"radius" = 1})
+     * @Route("/v1/awrr/{lat}/{lon}/{radius}", defaults={"radius" = 1}, name="api1_find")
      * @Template()
      */
     public function findAction($lat, $lon, $radius)
@@ -58,6 +36,6 @@ class DefaultController extends Controller
                 ->get('mapdzilla_finder')
                 ->find($lat, $lon, $radius);
                 
-        return new JsonResponse($results, 200);
+        return new JsonResponse(array('found' => count($results), 'parkings' => $results), 200);
     }
 }

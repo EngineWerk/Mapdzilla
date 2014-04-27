@@ -23,32 +23,31 @@ class ParkingLot
     
     public function find($lat, $lon, $radius) 
     {
-        $repositoryWays = $this->doctrine->getRepository('EnginewerkMapdzillaBundle:Way');
-        /* @var $repositoryWays \Enginewerk\MapdzillaBundle\Entity\WayRepository */
-
-        $ways = $repositoryWays->findAllJSON($lat, $lon, $radius);
-        
-        
         $repositoryNode = $this->doctrine->getRepository('EnginewerkMapdzillaBundle:Node');
         /* @var $repositoryNode \Enginewerk\MapdzillaBundle\Entity\NodeRepository */
         
-        $nodes = $repositoryNode->findAllJSON($lat, $lon, $radius);
+        $nodes = $repositoryNode->findByLatLonRadius($lat, $lon, $radius);
         
         $result = array();
         
         $template = array(
             'll' => array(),
-            'capacity' => 0,
-            'zone' => '-',
+//            'capacity' => 0,
+//            'zone' => '-',
             'id' => 0
         );
         
-        foreach ($ways as $way) {
-            //$result[] = $this->formatWay($way, $template);
-        }
+        $waysRegister = array();
         
         foreach ($nodes as $node) {
-            $result[] = $this->formatNode($node, $template);
+            if ($node->getWay() == null) {
+                $result[] = $this->formatNode($node, $template);
+            } else {
+                if (!isset($waysRegister[$node->getWay()->getId()])) {
+                    $result[] = $this->formatWay($node->getWay(), $template);
+                    $waysRegister[$node->getWay()->getId()] = $node->getWay()->getId();
+                }
+            }
         }
         
         return $result;
@@ -59,7 +58,7 @@ class ParkingLot
         $template['id'] = $node->getOSMNodeId();
         $template['capacity'] = rand(0, 69);
         $zone = array('A','B','-');
-        $template['zone'] = $zone[rand(0, 2)];
+        //$template['zone'] = $zone[rand(0, 2)];
         
         $template['ll'][] = array('lat' => $node->getLat(), 'lon' => $node->getLon());
         
@@ -71,12 +70,33 @@ class ParkingLot
         $template['id'] = $way->getOsmWayId();
         $template['capacity'] = rand(0, 69);
         $zone = array('A','B','-');
-        $template['zone'] = $zone[rand(0, 2)];
+        //$template['zone'] = $zone[rand(0, 2)];
         
         foreach($way->getNodes() as $node) {
             $template['ll'][] = array('lat' => $node->getLat(), 'lon' => $node->getLon());
         }
         
         return $template;
+    }
+    
+    public function getWithDescription()
+    {
+        return $this->getNodeRepository()->findWithNoWays();
+    }
+    
+    public function getWithNoDescription()
+    {
+        return $this->getNodeRepository()->findWithWays();
+    }
+    
+    /**
+     * 
+     * @return \Enginewerk\MapdzillaBundle\Entity\NodeRepository
+     */
+    protected function getNodeRepository()
+    {
+        return $this
+                ->doctrine
+                ->getRepository('EnginewerkMapdzillaBundle:Node');
     }
 }
