@@ -34,9 +34,15 @@ class Way
      */
     protected $nodes;
     
+    /**
+     * @ORM\OneToMany(targetEntity="Tag", mappedBy="way")
+     */
+    protected $tags;
+    
     public function __construct()
     {
         $this->nodes = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     /**
@@ -103,5 +109,38 @@ class Way
     public function getNodes()
     {
         return $this->nodes;
+    }
+
+    /**
+     * Add tags
+     *
+     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     * @return Way
+     */
+    public function addTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
+    {
+        $this->tags[] = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Remove tags
+     *
+     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     */
+    public function removeTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
+    {
+        $this->tags->removeElement($tags);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }

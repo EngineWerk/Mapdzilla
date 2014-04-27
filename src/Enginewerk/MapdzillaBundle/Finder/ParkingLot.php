@@ -33,7 +33,7 @@ class ParkingLot
         $template = array(
             'll' => array(),
 //            'capacity' => 0,
-//            'zone' => '-',
+            'zone' => '-',
             'id' => 0
         );
         
@@ -56,9 +56,14 @@ class ParkingLot
     protected function formatNode($node, $template)
     {
         $template['id'] = $node->getOSMNodeId();
-        $template['capacity'] = rand(0, 69);
-        $zone = array('A','B','-');
-        //$template['zone'] = $zone[rand(0, 2)];
+        
+        $tags = $node->getTags();
+        
+        foreach ($tags as $tag) {
+            if ($tag->getKey() != 'amenity') {
+                $template[$tag->getKey()] = $tag->getValue();
+            }
+        }
         
         $template['ll'][] = array('lat' => $node->getLat(), 'lon' => $node->getLon());
         
@@ -68,9 +73,17 @@ class ParkingLot
     protected function formatWay($way, $template)
     {
         $template['id'] = $way->getOsmWayId();
-        $template['capacity'] = rand(0, 69);
+        /*$template['capacity'] = rand(0, 69);
         $zone = array('A','B','-');
-        //$template['zone'] = $zone[rand(0, 2)];
+        //$template['zone'] = $zone[rand(0, 2)];*/
+        
+        $tags = $way->getTags();
+        
+        foreach ($tags as $tag) {
+            if ($tag->getKey() != 'amenity') {
+                $template[$tag->getKey()] = $tag->getValue();
+            }
+        }
         
         foreach($way->getNodes() as $node) {
             $template['ll'][] = array('lat' => $node->getLat(), 'lon' => $node->getLon());

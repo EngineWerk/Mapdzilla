@@ -3,6 +3,7 @@
 namespace Enginewerk\MapdzillaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Node
@@ -46,6 +47,16 @@ class Node
      * @ORM\JoinColumn(name="way_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $way;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="Tag", mappedBy="node")
+     */
+    protected $tags;
+    
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -147,5 +158,38 @@ class Node
     public function getWay()
     {
         return $this->way;
+    }
+
+    /**
+     * Add tags
+     *
+     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     * @return Node
+     */
+    public function addTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
+    {
+        $this->tags[] = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Remove tags
+     *
+     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     */
+    public function removeTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
+    {
+        $this->tags->removeElement($tags);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }
