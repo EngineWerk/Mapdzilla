@@ -32,7 +32,7 @@ class ParkingLot
         
         $template = array(
             'll' => array(),
-//            'capacity' => 0,
+            'distance' => 0,
             'zone' => '-',
             'id' => 0
         );
@@ -40,8 +40,7 @@ class ParkingLot
         $waysRegister = array();
         
         foreach ($nodes as $node) {
-            //var_dump($nodes);die();
-            $template['distance'] = $node->getId();
+            $template['distance'] = $node->getOSMNodeId();
             if ($node->getWay() == null) {
                 $result[] = $this->formatNode($node, $template);
             } else {

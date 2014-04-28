@@ -63,9 +63,10 @@ class NodeRepository extends EntityRepository
         ORDER BY distance ASC";
         
         $rsm->addEntityResult('Enginewerk\MapdzillaBundle\Entity\Node', 'n');
-        $rsm->addFieldResult('n', 'distance', 'id');
+        $rsm->addFieldResult('n', 'id', 'id');
         $rsm->addFieldResult('n', 'lat', 'lat');
         $rsm->addMetaResult('n', 'way_id', 'way_id');
+        $rsm->addMetaResult('n', 'distance', 'osm_node_id');
         $rsm->addFieldResult('n', 'lon', 'lon');
 
         $em = $this->getEntityManager();
