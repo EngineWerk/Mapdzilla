@@ -31,9 +31,10 @@ class DefaultController extends Controller
      */
     public function findAction($lat, $lon, $radius)
     {
-        $results = $this
-                ->get('mapdzilla_finder')
-                ->find($lat, $lon, $radius);
+         $finder = $this->get('mapdzilla_finder');
+        /* @var $finder \Enginewerk\MapdzillaBundle\Finder\ParkingLot */
+         
+        $results = $finder->find($lat, $lon, $radius);
 
         return new JsonResponse(array('found' => count($results), 'parkings' => $results), 200);
     }
