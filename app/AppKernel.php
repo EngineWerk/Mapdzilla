@@ -1,6 +1,5 @@
 <?php
 ini_set('memory_limit', '128M');
- 
 date_default_timezone_set('Europe/Warsaw');
 
 use Symfony\Component\HttpKernel\Kernel;
