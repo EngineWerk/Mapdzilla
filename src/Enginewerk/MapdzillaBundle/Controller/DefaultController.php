@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
@@ -19,13 +18,13 @@ class DefaultController extends Controller
     {
         $finder = $this->get('mapdzilla_finder');
         /* @var $finder \Enginewerk\MapdzillaBundle\Finder\ParkingLot */
-        
+
         return array(
             'described' => count($finder->getWithDescription()),
             'undescribed' => count($finder->getWithNoDescription())
                 );
     }
-    
+
     /**
      * @Route("/v1/awrr/{lat}/{lon}/{radius}", defaults={"radius" = 1}, name="api1_find")
      * @Template()
@@ -35,7 +34,7 @@ class DefaultController extends Controller
         $results = $this
                 ->get('mapdzilla_finder')
                 ->find($lat, $lon, $radius);
-                
+
         return new JsonResponse(array('found' => count($results), 'parkings' => $results), 200);
     }
 }

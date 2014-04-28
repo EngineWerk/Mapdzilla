@@ -21,16 +21,15 @@ class ParseOSMCommand extends ContainerAwareCommand
 {
     /**
      *
-     * @var OutputInterface 
+     * @var OutputInterface
      */
     protected $output;
-    
+
     /**
      *
      * @var Crawler
      */
     protected $crawler;
-
 
     protected function configure()
     {
@@ -45,7 +44,7 @@ class ParseOSMCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
-        
+
         $files = scandir($this->getContainer()->get('kernel')->getRootDir() . '/data/');
         foreach ($files as $mapfile) {
             $filepath = $this->getContainer()->get('kernel')->getRootDir() . '/data/' . $mapfile;
@@ -57,79 +56,79 @@ class ParseOSMCommand extends ContainerAwareCommand
         }
 
     }
-    
-    protected function processData($xmlData) 
+
+    protected function processData($xmlData)
     {
-        
+
         /*$url = sprintf('http://api.openstreetmap.org/api/0.6/map?bbox=%s', $input->getArgument('bbox'));
         $xmlData = $this->getXMLData($url);*/
         $this->output->writeln(number_format(strlen($xmlData), 2, ',', ' ') . ' bytes');
-        
+
         $this->crawler = new Crawler($xmlData);
         $mapNodes = $this
                 ->getCrawler()
                 ->filter('tag[v=parking]');
 
-        $this->output->writeln('<info>Nodes</info>');    
+        $this->output->writeln('<info>Nodes</info>');
         $nodes = $this->filterNodes($mapNodes);
-        
+
         foreach ($nodes as $nodeDom) {
             $this->readTags($nodeDom);
             $node = $this->updateNode($nodeDom);
             $this->readTags($nodeDom);
-            
+
             foreach ($nodeDom->getElementsByTagName('tag') as $tagAttribute) {
                 $this->updateTag($tagAttribute, null, $node);
             }
         }
-        
+
         $this
                 ->getDoctrine()
                 ->getEntityManager()
                 ->flush();
-        
+
         $this->output->writeln('<info>Ways</info>');
         $ways = $this->filterWays($mapNodes);
-        
-        foreach($ways as $wayDom) {
-            
+
+        foreach ($ways as $wayDom) {
+
             $this->output->writeln('Way: ' . $wayDom->getAttribute('id') . ' ');
-            
+
             $way = $this->updateWay($wayDom);
             $this->readTags($wayDom);
-            
+
             foreach ($wayDom->getElementsByTagName('tag') as $tagAttribute) {
                 $this->updateTag($tagAttribute, $way);
             }
-            
-            foreach($this->getWayNodes($wayDom) as $wayNode) {
+
+            foreach ($this->getWayNodes($wayDom) as $wayNode) {
                 /* @var $wayNode \Symfony\Component\DomCrawler\Crawler */
                 $this
                         ->output
                         ->writeln(sprintf('lat: %s, lon: %s', $wayNode->attr('lat'), $wayNode->attr('lon') ));
-                
+
                 $this->updateNode($wayNode->getNode(0), $way);
             }
-            
+
             $this
                 ->getDoctrine()
                 ->getEntityManager()
                 ->flush();
-            
+
             $this->output->writeln('');
         }
     }
-    
+
     /**
-     * 
+     *
      * @param \DOMElement $way
      */
     protected function readTags($way)
     {
         $tags = array();
-        
+
         $children = $way->getElementsByTagName('tag');
-        
+
         foreach ($children as $child) {
             /* @var $child \DOMNode */
             if ($child->hasAttribute('v')) {
@@ -137,66 +136,66 @@ class ParseOSMCommand extends ContainerAwareCommand
                 $tags[] = array('key' => $child->getAttribute('k'), 'value' => $child->getAttribute('v'));
             }
         }
-        
+
         return $tags;
     }
 
     protected function filterNodes($mapNodes)
     {
         $nodes = array();
-        
+
         foreach ($mapNodes as $domElement) {
-            if($domElement->parentNode->nodeName === 'node') {
-                
+            if ($domElement->parentNode->nodeName === 'node') {
+
                 $parentNode = $domElement->parentNode;
 
                 $this
                     ->getOutput()
                     ->writeln(sprintf(
-                            'Node: %s, lat: %s, lon: %s', 
-                            $parentNode->getAttribute('id'), 
-                            $parentNode->getAttribute('lat'), 
+                            'Node: %s, lat: %s, lon: %s',
+                            $parentNode->getAttribute('id'),
+                            $parentNode->getAttribute('lat'),
                             $parentNode->getAttribute('lon')
                             )
                         );
                 $nodes[] = $parentNode;
             }
         }
-        
+
         return $nodes;
     }
-    
+
     protected function filterWays($mapNodes)
     {
         $wayList = array();
-        
+
         foreach ($mapNodes as $domElement) {
-            if($domElement->parentNode->nodeName === 'way') {
+            if ($domElement->parentNode->nodeName === 'way') {
                 $wayList[] = $domElement->parentNode;
             }
         }
-        
+
         return $wayList;
     }
-    
+
     protected function getWayNodes(\DOMElement $domElement)
     {
         $nodeIdList = array();
-        foreach($domElement->childNodes as $childNode) {
-            
+        foreach ($domElement->childNodes as $childNode) {
+
             /*$this
                     ->getOutput()
                     ->write($childNode->nodeName);*/
-            
-            if($childNode->nodeName === 'nd') {
+
+            if ($childNode->nodeName === 'nd') {
                 /*$this
                     ->getOutput()
                     ->write($childNode->nodeName);*/
-                
+
                $nodeIdList[] = $this->findById($childNode->getAttribute('ref'));
             }
         }
-        
+
         return $nodeIdList;
     }
 
@@ -205,25 +204,24 @@ class ParseOSMCommand extends ContainerAwareCommand
         return $this->getCrawler()->filterXPath("//*[@id='" .$id  . "']");
     }
 
-
     /**
-     * 
+     *
      * @return OutputInterface
      */
     protected function getOutput()
     {
         return $this->output;
     }
-    
+
     /**
-     * 
+     *
      * @return Crawler
      */
     protected function getCrawler()
     {
         return $this->crawler;
     }
-    
+
     protected function getXMLData($url)
     {
         $cacheFileName = md5($url);
@@ -238,37 +236,37 @@ class ParseOSMCommand extends ContainerAwareCommand
 
         return $response;
     }
-    
+
     /**
-     * 
-     * @param type $wayNode
+     *
+     * @param  type                                   $wayNode
      * @return \Enginewerk\MapdzillaBundle\Entity\Way
      */
     protected function updateWay($wayNode)
     {
         $wayId = $wayNode->getAttribute('id');
-        
+
         $doctrine = $this->getDoctrine();
         $em = $doctrine->getEntityManager();
 
         $way = $doctrine
                 ->getRepository('EnginewerkMapdzillaBundle:Way')
                 ->findOneByOsmWayId($wayId);
-        
+
         if (!$way) {
             $way = new Way();
             $way->setOsmWayId($wayId);
-            
+
             $em->persist($way);
         }
-        
+
         return $way;
     }
-    
+
     /**
-     * 
-     * @param type $domNode
-     * @param \Enginewerk\MapdzillaBundle\Entity\Way $way
+     *
+     * @param  type                                    $domNode
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Way  $way
      * @return \Enginewerk\MapdzillaBundle\Entity\Node
      */
     protected function updateNode(\DOMElement $domNode, $way = null)
@@ -276,32 +274,32 @@ class ParseOSMCommand extends ContainerAwareCommand
         $nodeId = $domNode->getAttribute('id');
         $lat = $domNode->getAttribute('lat');
         $lon = $domNode->getAttribute('lon');
-        
+
         $doctrine = $this->getDoctrine();
         $em = $doctrine->getEntityManager();
 
         $node = $doctrine
                 ->getRepository('EnginewerkMapdzillaBundle:Node')
                 ->findOneByOsmNodeId($nodeId);
-        
+
         if (!$node) {
             $node = new Node();
             $node->setOsmNodeId($nodeId);
             $node->setLat($lat);
             $node->setLon($lon);
             $node->setWay($way);
-            
+
             $em->persist($node);
         }
-        
+
         return $node;
     }
-    
+
     protected function updateTag(\DOMElement $tagNode, $way = null, $node = null)
     {
         $keyAttribute = $tagNode->getAttribute('k');
         $valueAttribute = $tagNode->getAttribute('v');
-        
+
         $doctrine = $this->getDoctrine();
         $em = $doctrine->getEntityManager();
 
@@ -310,13 +308,13 @@ class ParseOSMCommand extends ContainerAwareCommand
                     ->getRepository('EnginewerkMapdzillaBundle:Tag')
                     ->findOneByWayAndKeyAndValue($way, $keyAttribute, $valueAttribute);
         }
-        
+
         if ($node) {
             $tag = $doctrine
                 ->getRepository('EnginewerkMapdzillaBundle:Tag')
                 ->findOneByNodeAndKeyAndValue($node, $keyAttribute, $valueAttribute);
         }
-        
+
         if (!$tag) {
             $tag = new Tag();
         }
@@ -325,17 +323,17 @@ class ParseOSMCommand extends ContainerAwareCommand
         $tag->setValue($valueAttribute);
         $tag->setWay($way);
         $tag->setNode($node);
-        
+
         $em->persist($tag);
-        
+
         return $tag;
     }
-    
+
     /**
-     * 
+     *
      * @return type
      */
-    protected function getDoctrine() 
+    protected function getDoctrine()
     {
         return $this
                 ->getContainer()

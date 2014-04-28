@@ -17,25 +17,24 @@ class NodeRepository extends EntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('n');
         $queryBuilder->where('n.way IS NULL');
-        
+
         return $queryBuilder
                 ->getQuery()
                 ->getResult();
     }
-    
+
     public function findWithWays()
     {
         $queryBuilder = $this->createQueryBuilder('n');
         $queryBuilder
                 ->where('n.way IS NOT NULL')
                 ->groupBy('n.way');
-        
+
         return $queryBuilder
                 ->getQuery()
                 ->getResult();
     }
-    
-    
+
     public function findByLatLonRadius($lat, $lng, $radius)
     {
         // Constants related to the surface of the Earth
@@ -55,13 +54,13 @@ class NodeRepository extends EntityRepository
         // build rsm here
 
         // Construct our sql statement
-        $sql = 
+        $sql =
         "SELECT *, ($distance_formula) AS distance
         FROM node
         WHERE (lat BETWEEN :lat_b1 AND :lat_b2) AND (lon BETWEEN :lng_b1 AND :lng_b2)
         HAVING distance < :radius
         ORDER BY distance ASC";
-        
+
         $rsm->addEntityResult('Enginewerk\MapdzillaBundle\Entity\Node', 'n');
         $rsm->addFieldResult('n', 'id', 'id');
         $rsm->addFieldResult('n', 'lat', 'lat');
@@ -71,7 +70,7 @@ class NodeRepository extends EntityRepository
 
         $em = $this->getEntityManager();
         $query = $em->createNativeQuery($sql, $rsm);
-        
+
         $parameters = array(
             'earths_radius' => $earths_radius,
             'lat' => $lat,

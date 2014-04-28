@@ -7,12 +7,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Node
- * 
+ *
  * @ORM\Entity
  * @ORM\Table(name="node")
  * @ORM\Entity(repositoryClass="Enginewerk\MapdzillaBundle\Entity\NodeRepository")
  */
-class Node 
+class Node
 {
     /**
      * @ORM\Id
@@ -21,38 +21,38 @@ class Node
      * @var integer
      */
     protected $id;
-    
+
     /**
      * @ORM\Column(name="osm_node_id", type="integer", options={"unsigned"=true})
      * @var integer
      */
     protected $osmNodeId;
-    
+
     /**
      * @var decimal
      *
      * @ORM\Column(name="lat", type="float", scale=2, precision=7)
      */
     protected $lat;
-    
+
     /**
      * @var decimal
      *
      * @ORM\Column(name="lon", type="float", scale=3, precision=7)
      */
     protected $lon;
-    
+
     /**
      * @ORM\ManyToOne(targetEntity="Way", inversedBy="nodes")
      * @ORM\JoinColumn(name="way_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $way;
-    
+
     /**
      * @ORM\OneToMany(targetEntity="Tag", mappedBy="node")
      */
     protected $tags;
-    
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -61,7 +61,7 @@ class Node
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -71,7 +71,7 @@ class Node
     /**
      * Set osmNodeId
      *
-     * @param integer $osmNodeId
+     * @param  integer $osmNodeId
      * @return Node
      */
     public function setOsmNodeId($osmNodeId)
@@ -84,7 +84,7 @@ class Node
     /**
      * Get osmNodeId
      *
-     * @return integer 
+     * @return integer
      */
     public function getOsmNodeId()
     {
@@ -94,7 +94,7 @@ class Node
     /**
      * Set lat
      *
-     * @param float $lat
+     * @param  float $lat
      * @return Node
      */
     public function setLat($lat)
@@ -107,7 +107,7 @@ class Node
     /**
      * Get lat
      *
-     * @return float 
+     * @return float
      */
     public function getLat()
     {
@@ -117,7 +117,7 @@ class Node
     /**
      * Set lon
      *
-     * @param float $lon
+     * @param  float $lon
      * @return Node
      */
     public function setLon($lon)
@@ -130,7 +130,7 @@ class Node
     /**
      * Get lon
      *
-     * @return float 
+     * @return float
      */
     public function getLon()
     {
@@ -140,7 +140,7 @@ class Node
     /**
      * Set way
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Way $way
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Way $way
      * @return Node
      */
     public function setWay(\Enginewerk\MapdzillaBundle\Entity\Way $way = null)
@@ -153,7 +153,7 @@ class Node
     /**
      * Get way
      *
-     * @return \Enginewerk\MapdzillaBundle\Entity\Way 
+     * @return \Enginewerk\MapdzillaBundle\Entity\Way
      */
     public function getWay()
     {
@@ -163,7 +163,7 @@ class Node
     /**
      * Add tags
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Tag $tags
      * @return Node
      */
     public function addTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
@@ -186,7 +186,7 @@ class Node
     /**
      * Get tags
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getTags()
     {

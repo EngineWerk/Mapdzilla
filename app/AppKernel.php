@@ -1,6 +1,4 @@
 <?php
-ini_set('upload_max_filesize', '64M');
-ini_set('post_max_size', '64M');
 ini_set('memory_limit', '128M');
  
 date_default_timezone_set('Europe/Warsaw');

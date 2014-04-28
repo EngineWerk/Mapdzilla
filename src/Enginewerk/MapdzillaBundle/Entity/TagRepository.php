@@ -30,7 +30,7 @@ class TagRepository extends EntityRepository
                 ->getQuery()
                 ->getFirstResult();
     }
-    
+
     public function findOneByNodeAndKeyAndValue($node, $keyAttribute, $valueAttribute)
     {
         $queryBuilder = $this->createQueryBuilder('t');

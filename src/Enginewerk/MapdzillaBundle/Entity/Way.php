@@ -5,15 +5,14 @@ namespace Enginewerk\MapdzillaBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-
 /**
  * Way
- * 
+ *
  * @ORM\Entity
  * @ORM\Table(name="way")
  * @ORM\Entity(repositoryClass="Enginewerk\MapdzillaBundle\Entity\WayRepository")
  */
-class Way 
+class Way
 {
     /**
      * @ORM\Id
@@ -22,23 +21,23 @@ class Way
      * @var integer
      */
     protected $id;
-    
+
     /**
      * @ORM\Column(name="osm_way_id", type="integer", options={"unsigned"=true})
      * @var integer
      */
     protected $osmWayId;
-    
+
     /**
      * @ORM\OneToMany(targetEntity="Node", mappedBy="way")
      */
     protected $nodes;
-    
+
     /**
      * @ORM\OneToMany(targetEntity="Tag", mappedBy="way")
      */
     protected $tags;
-    
+
     public function __construct()
     {
         $this->nodes = new ArrayCollection();
@@ -48,7 +47,7 @@ class Way
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -58,7 +57,7 @@ class Way
     /**
      * Set osmWayId
      *
-     * @param integer $osmWayId
+     * @param  integer $osmWayId
      * @return Way
      */
     public function setOsmWayId($osmWayId)
@@ -71,7 +70,7 @@ class Way
     /**
      * Get osmWayId
      *
-     * @return integer 
+     * @return integer
      */
     public function getOsmWayId()
     {
@@ -81,7 +80,7 @@ class Way
     /**
      * Add nodes
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Node $nodes
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Node $nodes
      * @return Way
      */
     public function addNode(\Enginewerk\MapdzillaBundle\Entity\Node $nodes)
@@ -104,7 +103,7 @@ class Way
     /**
      * Get nodes
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getNodes()
     {
@@ -114,7 +113,7 @@ class Way
     /**
      * Add tags
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Tag $tags
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Tag $tags
      * @return Way
      */
     public function addTag(\Enginewerk\MapdzillaBundle\Entity\Tag $tags)
@@ -137,7 +136,7 @@ class Way
     /**
      * Get tags
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getTags()
     {

@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 use Symfony\Component\DomCrawler\Crawler;
 
-
 /**
  * Description of RetriveMapCommand
  *
@@ -19,16 +18,15 @@ class RetriveMapCommand extends ContainerAwareCommand
 {
     /**
      *
-     * @var OutputInterface 
+     * @var OutputInterface
      */
     protected $output;
-    
+
     /**
      *
      * @var Crawler
      */
     protected $crawler;
-
 
     protected function configure()
     {
@@ -45,34 +43,33 @@ class RetriveMapCommand extends ContainerAwareCommand
         $this->output = $output;
         $bbox = explode(',', $input->getArgument('bbox'));
         $coorindates = $this->getGridCoordinates($bbox);
-        
+
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, count($coorindates));
-        
+
         foreach ($coorindates as $coordinate) {
-            
+
             $url = sprintf(
-                    'http://api.openstreetmap.org/api/0.6/map?bbox=%s,%s', 
+                    'http://api.openstreetmap.org/api/0.6/map?bbox=%s,%s',
                     $coordinate['l-lon'] . ',' . $coordinate['l-lat'],
                     $coordinate['r-lon'] . ',' . $coordinate['r-lat']
-                    
+
                     );
             //$output->writeln($url);
             $this->getXMLData($url);
             $progress->advance();
         }
-        
-        
+
     }
-    
+
     protected function getGridCoordinates($bbox)
     {
         $leftTopLatitude = $bbox[1]; // Szerokość
         $leftTopLongitude= $bbox[0];
-        
+
         $rightBottomLatitude = $bbox[3];
         $rightBottomLongitude = $bbox[2];
-        
+
         //$latStep = abs($leftTopLatitude - $rightBottomLatitude) / 0.04;
         //$lonStep = abs($leftTopLongitude - $rightBottomLongitude) / 0.02; // 18.44
         $latLonList = array();
@@ -83,21 +80,21 @@ class RetriveMapCommand extends ContainerAwareCommand
                 //$this->output->writeln(implode(',', array('l-lon' => $lon, 'l-lat' => $lat, 'r-lon' => $lon + 0.02, 'r-lat' => $lat + 0.04)));
             }
         }
-       
+
         return $latLonList;
     }
-    
+
     /**
-     * 
+     *
      * @return type
      */
-    protected function getDoctrine() 
+    protected function getDoctrine()
     {
         return $this
                 ->getContainer()
                 ->get('doctrine');
     }
-    
+
     protected function getXMLData($url)
     {
         $cacheFileName = md5($url);

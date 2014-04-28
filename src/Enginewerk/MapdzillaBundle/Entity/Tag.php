@@ -3,16 +3,15 @@
 namespace Enginewerk\MapdzillaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Tag
- * 
+ *
  * @ORM\Entity
  * @ORM\Table(name="tag")
  * @ORM\Entity(repositoryClass="Enginewerk\MapdzillaBundle\Entity\TagRepository")
  */
-class Tag 
+class Tag
 {
     /**
      * @ORM\Id
@@ -21,23 +20,23 @@ class Tag
      * @var integer
      */
     protected $id;
-    
+
     /**
      * @ORM\Column(type="string", length=64, name="k")
      */
     protected $key;
-    
+
     /**
      * @ORM\Column(type="string", length=64, name="v")
      */
     protected $value;
-    
+
     /**
      * @ORM\ManyToOne(targetEntity="Node", inversedBy="tags")
      * @ORM\JoinColumn(name="node_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $node;
-    
+
     /**
      * @ORM\ManyToOne(targetEntity="Way", inversedBy="tags")
      * @ORM\JoinColumn(name="way_id", referencedColumnName="id", onDelete="CASCADE")
@@ -47,7 +46,7 @@ class Tag
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -57,7 +56,7 @@ class Tag
     /**
      * Set key
      *
-     * @param string $key
+     * @param  string $key
      * @return Tag
      */
     public function setKey($key)
@@ -70,7 +69,7 @@ class Tag
     /**
      * Get key
      *
-     * @return string 
+     * @return string
      */
     public function getKey()
     {
@@ -80,7 +79,7 @@ class Tag
     /**
      * Set value
      *
-     * @param string $value
+     * @param  string $value
      * @return Tag
      */
     public function setValue($value)
@@ -93,7 +92,7 @@ class Tag
     /**
      * Get value
      *
-     * @return string 
+     * @return string
      */
     public function getValue()
     {
@@ -103,7 +102,7 @@ class Tag
     /**
      * Set node
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Node $node
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Node $node
      * @return Tag
      */
     public function setNode(\Enginewerk\MapdzillaBundle\Entity\Node $node = null)
@@ -116,7 +115,7 @@ class Tag
     /**
      * Get node
      *
-     * @return \Enginewerk\MapdzillaBundle\Entity\Node 
+     * @return \Enginewerk\MapdzillaBundle\Entity\Node
      */
     public function getNode()
     {
@@ -126,7 +125,7 @@ class Tag
     /**
      * Set way
      *
-     * @param \Enginewerk\MapdzillaBundle\Entity\Way $way
+     * @param  \Enginewerk\MapdzillaBundle\Entity\Way $way
      * @return Tag
      */
     public function setWay(\Enginewerk\MapdzillaBundle\Entity\Way $way = null)
@@ -139,7 +138,7 @@ class Tag
     /**
      * Get way
      *
-     * @return \Enginewerk\MapdzillaBundle\Entity\Way 
+     * @return \Enginewerk\MapdzillaBundle\Entity\Way
      */
     public function getWay()
     {
