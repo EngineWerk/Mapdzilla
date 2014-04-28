@@ -65,7 +65,7 @@ class NodeRepository extends EntityRepository
         $rsm->addFieldResult('n', 'id', 'id');
         $rsm->addFieldResult('n', 'lat', 'lat');
         $rsm->addMetaResult('n', 'way_id', 'way_id');
-        $rsm->addMetaResult('n', 'distance', 'osm_node_id');
+        $rsm->addMetaResult('n', 'distance', 'distance');
         $rsm->addFieldResult('n', 'lon', 'lon');
 
         $em = $this->getEntityManager();
@@ -84,6 +84,6 @@ class NodeRepository extends EntityRepository
 
         $query->setParameters($parameters);
 
-        return $query->getResult();
+        return $query->getArrayResult();
     }
 }

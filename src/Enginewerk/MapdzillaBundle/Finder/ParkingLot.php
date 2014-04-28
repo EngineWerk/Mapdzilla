@@ -33,25 +33,42 @@ class ParkingLot
         $template = array(
             'll' => array(),
             'distance' => 0,
-            'zone' => '-',
-            'id' => 0
+            'zone' => '-'
         );
 
         $waysRegister = array();
 
         foreach ($nodes as $node) {
-            $template['distance'] = $node->getOSMNodeId();
-            if ($node->getWay() == null) {
-                $result[] = $this->formatNode($node, $template);
+
+            $template['distance'] = round($node['distance'], 3);
+            
+            if (!isset($node['way_id']) || $node['way_id'] == null) {
+                $result[] = $this->formatArrayNode($node, $template);
             } else {
-                if (!isset($waysRegister[$node->getWay()->getId()])) {
-                    $result[] = $this->formatWay($node->getWay(), $template);
-                    $waysRegister[$node->getWay()->getId()] = $node->getWay()->getId();
+                if (!isset($waysRegister[$node['way_id']])) {
+                    $way = $this->getWayRepository()->find($node['way_id']);
+                    $result[] = $this->formatWay($way, $template);
+                    $waysRegister[$node['way_id']] = $node['way_id'];
                 }
             }
         }
 
         return $result;
+    }
+    
+    protected function formatArrayNode($node, $template)
+    {
+        $tags = $this->getTagRepository()->findByNode($node['id']);
+
+        foreach ($tags as $tag) {
+            if ($tag->getKey() != 'amenity') {
+                $template[$tag->getKey()] = $tag->getValue();
+            }
+        }
+
+        $template['ll'][] = array('lat' => $node['lat'], 'lon' => $node['lon']);
+
+        return $template;
     }
 
     protected function formatNode($node, $template)
@@ -73,11 +90,6 @@ class ParkingLot
 
     protected function formatWay($way, $template)
     {
-        $template['id'] = $way->getOsmWayId();
-        /*$template['capacity'] = rand(0, 69);
-        $zone = array('A','B','-');
-        //$template['zone'] = $zone[rand(0, 2)];*/
-
         $tags = $way->getTags();
 
         foreach ($tags as $tag) {
@@ -112,5 +124,27 @@ class ParkingLot
         return $this
                 ->doctrine
                 ->getRepository('EnginewerkMapdzillaBundle:Node');
+    }
+    
+    /**
+     *
+     * @return \Enginewerk\MapdzillaBundle\Entity\WayRepository
+     */
+    protected function getWayRepository()
+    {
+        return $this
+                ->doctrine
+                ->getRepository('EnginewerkMapdzillaBundle:Way');
+    }
+    
+    /**
+     *
+     * @return \Enginewerk\MapdzillaBundle\Entity\TagRepository
+     */
+    protected function getTagRepository()
+    {
+        return $this
+                ->doctrine
+                ->getRepository('EnginewerkMapdzillaBundle:Tag');
     }
 }
